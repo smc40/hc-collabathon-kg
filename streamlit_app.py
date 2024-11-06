@@ -56,5 +56,3 @@ return_value = agraph(nodes=nodes,
 
 
 
-
-
