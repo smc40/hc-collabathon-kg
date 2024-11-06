@@ -56,3 +56,8 @@ return_value = agraph(nodes=nodes,
 
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 0321921 (Initial graph)
