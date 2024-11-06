@@ -1,3 +1,6 @@
 streamlit
 pandas
+<<<<<<< HEAD
 streamlit-agraph
+=======
+>>>>>>> c1dbf42 (First app version)
