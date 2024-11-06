@@ -1,34 +1,43 @@
 import streamlit as st
 import pandas as pd
 from streamlit_agraph import agraph, Node, Edge, Config
-from src.utils import DATA_FILE
+from src.utils import DATA_FILE, WEIGHT_FILE
 
 st.set_page_config(layout="wide")
 
 with open(DATA_FILE) as dfile:
-    df = pd.read_csv(dfile)
+    df_nodes = pd.read_csv(dfile)
 
+df_nodes.dropna(subset=["id_trial"], inplace=True)
 
-st.title('Bob Blobs')
+with open(WEIGHT_FILE) as dfile:
+    df_edges = pd.read_csv(dfile)
 
+#extract unique cuids
+node_names = list(set(df_nodes["id_trial"]))
 
 nodes = []
 edges = []
-nodes.append( Node(id="Spiderman", 
-                   label="Peter Parker", 
-                   size=25)
-            ) # includes **kwargs
-nodes.append( Node(id="Captain_Marvel", 
-                   size=25) 
-            )
-edges.append( Edge(source="Captain_Marvel", 
-                   label="friend_of", 
-                   target="Spiderman", 
-                   # **kwargs
-                   ) 
-            ) 
 
-config = Config(width=750,
+for n in node_names:
+    nodes.append(Node(
+        id=n,
+        label = n,
+        size=20
+    ))
+
+st.title('Bob Blobs')
+
+for index, (source, target, weight) in df_edges.iterrows():
+    edges.append(
+        Edge(
+            source=source,
+            target=target
+        )
+    )
+
+
+config = Config(width=1250,
                 height=950,
                 directed=False, 
                 physics=True, 
