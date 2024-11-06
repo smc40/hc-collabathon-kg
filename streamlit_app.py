@@ -33,7 +33,6 @@ for n in unique_edge_nodes:
 st.title('Bob Blobs')
 
 for index, (source, target, weight) in df_edges.iterrows():
-    print(source + " " + target)
     edges.append(
         Edge(
             source=source,
