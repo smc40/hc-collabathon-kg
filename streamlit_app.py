@@ -15,11 +15,13 @@ with open(WEIGHT_FILE) as dfile:
 
 #extract unique cuids
 node_names = list(set(df_nodes["id_trial"]))
+unique_edge_nodes = set(df_edges['pm_ref']).union(set(df_edges['pm_rel']))
+node_names = [n for n in node_names if n in unique_edge_nodes]
 
 nodes = []
 edges = []
 
-for n in node_names:
+for n in unique_edge_nodes:
     nodes.append(Node(
         id=n,
         label = n,
@@ -29,6 +31,7 @@ for n in node_names:
 st.title('Bob Blobs')
 
 for index, (source, target, weight) in df_edges.iterrows():
+    print(source + " " + target)
     edges.append(
         Edge(
             source=source,
