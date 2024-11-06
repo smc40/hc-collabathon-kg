@@ -12,6 +12,8 @@ df_nodes.dropna(subset=["id_trial"], inplace=True)
 
 with open(WEIGHT_FILE) as dfile:
     df_edges = pd.read_csv(dfile)
+cluster_nodes = ["NCT05029583", "NCT05583344", "NCT01186952", "NCT05844644"]
+df_edges = df_edges[(df_edges["pm_ref"].isin(cluster_nodes)) | (df_edges["pm_rel"].isin(cluster_nodes))]
 
 #extract unique cuids
 node_names = list(set(df_nodes["id_trial"]))
@@ -31,7 +33,6 @@ for n in unique_edge_nodes:
 st.title('Bob Blobs')
 
 for index, (source, target, weight) in df_edges.iterrows():
-    print(source + " " + target)
     edges.append(
         Edge(
             source=source,
