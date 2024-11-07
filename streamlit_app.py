@@ -41,8 +41,10 @@ with srch:
 
 df_edges = _get_edges(search_query)
 
-min_val = min(0, df_edges[^''])
-threshold = st.slider('Weight Threshold')
+min_val = min(0.0, df_edges['weight_cosine'].min())
+max_val = max(1.0, df_edges['weight_cosine'].max())
+threshold = st.slider('Weight Threshold', min_value=min_val, max_value=max_val, value=min_val, step=0.01)
+df_edges = df_edges[df_edges['weight_cosine'] >= threshold]
 
 if search_query:
     st.text(f'You are searching for: {search_query}')
