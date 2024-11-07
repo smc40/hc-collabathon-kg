@@ -28,11 +28,11 @@ def load_edges(nodes: List | None = None) -> pd.DataFrame:
         df = df[(df["pm_ref"].isin(nodes)) | (df["pm_rel"].isin(nodes))]
     return df
 
-# _INDEXER = FaissIndexer()
-# df = load_nodes()
-# data = _INDEXER.transform_vector_column(df, 'idphrase')
-# _INDEXER.build_index(data)
-# _INDEXER.save_index('faiss_index.index')
+_INDEXER = FaissIndexer()
+df = load_nodes()
+data = _INDEXER.transform_vector_column(df, 'idphrase')
+_INDEXER.build_index(data)
+_INDEXER.save_index('faiss_index.index')
 
 def search_index(text: str, k: int=5, neighbor_sensitivity: int=75) -> List[Tuple[float, pd.Series]]:
     neighbors = _INDEXER.search_by_text(text, k=k, neighbor_sensitivity=neighbor_sensitivity)
