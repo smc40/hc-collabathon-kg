@@ -72,7 +72,7 @@ for _, (src_name, tgt_name, _, weight, tgt_title, src_title) in df_edges.iterrow
             target=node_id_template.format(name=tgt_name, title=tgt_title),
         )
     )
-config = Config(width=1250,
+config = Config(width=2160,
                 height=950,
                 directed=False,
                 physics=True,
