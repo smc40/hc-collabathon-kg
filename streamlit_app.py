@@ -23,42 +23,73 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 st.markdown("<h1 class='title'>Clinical Assessment Reports Network</h1>", unsafe_allow_html=True)
-_, srch, _ = st.columns([1, 3, 1])
-with srch:
-    search_query = st.text_input("Search", placeholder="Search Titles", label_visibility="collapsed")
 
-if search_query:
-    st.text(f'You are searching for: {search_query}')
-    neighbors = utl.search_index(search_query)
+# _, srch, _ = st.columns([1, 3, 1])
+# with srch:
+#     search_query = st.text_input("Search", placeholder="Search Titles", label_visibility="collapsed")
+#
+# if search_query:
+#     st.text(f'You are searching for: {search_query}')
+#     neighbors = utl.search_index(search_query)
+#
+#     nodes = [n["id_trial"] for _, n in neighbors]
+#     edges = utl.load_edges(nodes=nodes)
+#     nodes = list(set(edges['pm_ref'].values).union(set(edges['pm_rel'].values)))
+#
+#     for nde in nodes:
+#         nodes.append(Node(
+#             id=nde,
+#             label=nde,
+#             size=20
+#         ))
+#
+#
+#     for _, (source, target, weight) in edges.iterrows():
+#         edges.append(
+#             Edge(
+#                 source=source,
+#                 target=target
+#             )
+#         )
+#
+#
+#     config = Config(width=1250,
+#                     height=950,
+#                     directed=False,
+#                     physics=True,
+#                     hierarchical=False,
+#                     )
+#
+#     return_value = agraph(nodes=nodes, edges=edges, config=config)
 
-    nodes = [n["id_trial"] for _, n in neighbors]
-    print(nodes)
+nodes = ["NCT05029583", "NCT05583344", "NCT01186952", "NCT05844644"]
+edges = utl.load_edges(nodes=nodes)
+nodes = list(set(edges['pm_ref'].values).union(set(edges['pm_rel'].values)))
+print(f'Number of nodes: {len(nodes)}')
+print(f'Number of edges: {len(edges)}')
 
-    edges = utl.load_edges(nodes=nodes)
-    print(len(edges))
-
-    for nde in nodes:
-        nodes.append(Node(
-            id=nde,
-            label=nde,
-            size=20
-        ))
+for nde in nodes:
+    nodes.append(Node(
+        id=nde,
+        label=nde,
+        size=20
+    ))
 
 
-    for _, (source, target, weight) in edges.iterrows():
-        edges.append(
-            Edge(
-                source=source,
-                target=target
-            )
+for _, (source, target, weight) in edges.iterrows():
+    edges.append(
+        Edge(
+            source=source,
+            target=target
         )
+    )
 
 
-    config = Config(width=1250,
-                    height=950,
-                    directed=False,
-                    physics=True,
-                    hierarchical=False,
-                    )
+config = Config(width=1250,
+                height=950,
+                directed=False,
+                physics=True,
+                hierarchical=False,
+                )
 
-    agraph(nodes=nodes, edges=edges, config=config)
+return_value = agraph(nodes=nodes, edges=edges, config=config)
