@@ -19,24 +19,6 @@ class FaissIndexer:
         self.stop_words = set(stopwords.words('english'))  # Set of stop words for cleaning text
         self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')  # Load a pre-trained embedding model
 
-    def load_data_from_csv(self, file_path):
-        """
-        Load data from a CSV file into a DataFrame.
-
-        Parameters:
-        - file_path (str): Path to the CSV file.
-
-        Returns:
-        - pd.DataFrame: DataFrame containing data loaded.
-        """
-        try:
-            df = pd.read_csv(file_path)
-            print(f"Loaded DataFrame with {len(df)} rows from {file_path}.")
-            return df
-        except Exception as e:
-            print(f"Failed to load data from CSV: {e}")
-            return None
-
     def transform_vector_column(self, df, text_column):
         """
         Transform and preprocess text data in a DataFrame column using a pre-trained embedding model.
@@ -156,26 +138,3 @@ class FaissIndexer:
             return None
         return self.search(query_vector, k, neighbor_sensitivity)
 
-if __name__ == "__main__":
-    indexer = FaissIndexer()
-    csv_file_path = 'data\data_sample.csv'
-    df = indexer.load_data_from_csv(csv_file_path)
-    
-    if df is not None:
-        text_column_name = 'idphrase'  # Assuming 'idphrase' is the column containing text data
-        data = indexer.transform_vector_column(df, text_column_name)
-        
-        if data is not None:
-            indexer.build_index(data)
-            index_file_path = 'faiss_index.index'
-            indexer.save_index(index_file_path)
-            search_text = "cancer"
-            neighbor_sensitivity = 75  # User-defined sensitivity from 0 to 100
-            neighbors = indexer.search_by_text(search_text, k=5, neighbor_sensitivity=neighbor_sensitivity)
-            
-            if neighbors:
-                print(f"\nSearch results for text query: {search_text}")
-                for dist, original_data in neighbors:
-                    print(f"Distance: {dist}, Original Data: {original_data}")
-            else:
-                print("No neighbors found or an error occurred during the search.")

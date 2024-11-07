@@ -1,5 +1,7 @@
+streamlit
+streamlit-agraph
 numpy
 pandas
-streamlit-agraph
 faiss-cpu
-streamlit
+nltk
+sentence_transformers
