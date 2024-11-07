@@ -9,7 +9,7 @@ ROOT_DIR = Path(__file__).parents[1]
 DATA_DIR = ROOT_DIR / 'data'
 
 NODES_FILE = DATA_DIR / 'data_sample_subgraph.csv'
-EDGES_FILE = DATA_DIR / 'full-graph-weights-cosine.csv'
+EDGES_FILE = DATA_DIR / 'full-graph-weights-cosine-cleaned.csv'
 
 # _CLUSTER_NODES = ["NCT05029583", "NCT05583344", "NCT01186952", "NCT05844644"]
 
@@ -26,6 +26,7 @@ def load_edges(nodes: List | None = None) -> pd.DataFrame:
 
     if nodes:
         df = df[(df["pm_ref"].isin(nodes)) | (df["pm_rel"].isin(nodes))]
+
     return df
 
 _INDEXER = FaissIndexer()
