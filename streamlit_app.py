@@ -39,23 +39,20 @@ _, srch, _ = st.columns([1, 3, 1])
 with srch:
     search_query = st.text_input("Search", placeholder="Search Titles", label_visibility="collapsed")
 
+df_edges = _get_edges(search_query)
+
+min_val = min(0.0, df_edges['weight_cosine'].min())
+max_val = max(1.0, df_edges['weight_cosine'].max())
+threshold = st.slider('Weight Threshold', min_value=min_val, max_value=max_val, value=min_val, step=0.01)
+df_edges = df_edges[df_edges['weight_cosine'] >= threshold]
+
 if search_query:
     st.text(f'You are searching for: {search_query}')
 
-df_edges = _get_edges(search_query)
 
 node_names = list(set(df_edges['pm_ref'].values).union(set(df_edges['pm_rel'].values)))
 node_name_title_map = {row['pm_ref']: row['phrase_ref'] for _, row in df_edges.iterrows()}
 node_name_title_map.update({row['pm_rel']: row['phrase_rel'] for _, row in df_edges.iterrows()})
-
-values = list(node_name_title_map.values())
-unique_values = list(set(values))
-for uv in unique_values:
-    values.remove(uv)
-print(values)
-
-print(f'Number of keys: {len(node_name_title_map)}')
-print(f'Number of values: {len(set(node_name_title_map.values()))}')
 
 nodes = []
 for name in node_names:
