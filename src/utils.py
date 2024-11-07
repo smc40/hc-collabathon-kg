@@ -9,7 +9,7 @@ ROOT_DIR = Path(__file__).parents[1]
 DATA_DIR = ROOT_DIR / 'data'
 
 NODES_FILE = DATA_DIR / 'data_sample_subgraph.csv'
-EDGES_FILE = DATA_DIR / 'fullgraph-freqweights.csv'
+EDGES_FILE = DATA_DIR / 'full-graph-weights-cosine.csv'
 
 # _CLUSTER_NODES = ["NCT05029583", "NCT05583344", "NCT01186952", "NCT05844644"]
 

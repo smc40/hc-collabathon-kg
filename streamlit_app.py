@@ -1,5 +1,4 @@
 import streamlit as st
-from networkx.algorithms.traversal import dfs_edges
 from streamlit_agraph import agraph, Node, Edge, Config
 
 import src.utils as utl
@@ -36,17 +35,19 @@ if search_query:
     node_names = [n["id_trial"] for _, n in neighbors]
     df_edges = utl.load_edges(nodes=node_names)
     node_names = list(set(df_edges['pm_ref'].values).union(set(df_edges['pm_rel'].values)))
+    node_name_title_map = {row['pm_ref']: row['phrase_ref'] for _, row in df_edges.iterrows()}
+    node_name_title_map.update({row['pm_rel']: row['phrase_rel'] for _, row in df_edges.iterrows()})
 
     nodes = []
-    for nde in node_names:
+    for name in node_names:
         nodes.append(Node(
-            id=nde,
-            label=nde,
+            id=node_name_title_map[name],
+            label=name,
             size=20
         ))
 
     edges = []
-    for _, (source, target, weight) in df_edges.iterrows():
+    for _, (_, _, _, weight, source, target) in df_edges.iterrows():
         edges.append(
             Edge(
                 source=source,
