@@ -54,19 +54,22 @@ node_names = list(set(df_edges['pm_ref'].values).union(set(df_edges['pm_rel'].va
 node_name_title_map = {row['pm_ref']: row['phrase_ref'] for _, row in df_edges.iterrows()}
 node_name_title_map.update({row['pm_rel']: row['phrase_rel'] for _, row in df_edges.iterrows()})
 
+node_id_template = '{name}: {title}'
 nodes = []
 for name in node_names:
+    title = node_name_title_map[name]
     nodes.append(Node(
-        id=node_name_title_map[name],
+        # id=node_name_title_map[name],
+        id=node_id_template.format(name=name, title=title),
         label=name,
         size=20
     ))
 edges = []
-for _, (_, _, _, weight, source, target) in df_edges.iterrows():
+for _, (src_name, tgt_name, _, weight, tgt_title, src_title) in df_edges.iterrows():
     edges.append(
         Edge(
-            source=source,
-            target=target
+            source=node_id_template.format(name=src_name, title=src_title),
+            target=node_id_template.format(name=tgt_name, title=tgt_title),
         )
     )
 config = Config(width=1250,
