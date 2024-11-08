@@ -7,7 +7,6 @@ from nltk.corpus import stopwords
 from sentence_transformers import SentenceTransformer
 import os
 import torch
-from tqdm import tqdm  # Import tqdm for progress bar
 
 # Download stopwords list if not already present
 nltk.download('stopwords')
@@ -59,13 +58,13 @@ class FaissIndexer:
         - np.ndarray: Numpy array of vectors.
         """
         try:
-            print("Transforming text data to vectors...")
-            # Use tqdm to show progress
+            # Convert text data to embeddings
             vectors = df[text_column].apply(lambda x: self.embedding_model.encode(
                 str(x),
                 convert_to_numpy=True,
                 device='cuda' if torch.cuda.is_available() else 'cpu'
-            ).astype('float32'), raw=False)
+            ).astype('float32'))
+
             valid_vectors = np.vstack(vectors)
             self.original_data = df.reset_index(drop=True)  # Keep track of the original data
             print(f"Transformed and preprocessed {len(valid_vectors)} valid vectors.")
@@ -166,7 +165,7 @@ class FaissIndexer:
             return None
 
         try:
-            # Adjust `k` based on user-defined sensitivity (scales from 1 to k based on sensitivity)
+            # Adjust k based on user-defined sensitivity (scales from 1 to k based on sensitivity)
             adjusted_k = max(1, int(k * (neighbor_sensitivity / 100)))
             query_vector = np.array(query_vector).astype('float32').reshape(1, -1)
 
@@ -195,7 +194,7 @@ class FaissIndexer:
 
     def process_csv_and_build_or_load_index(self, csv_file_path, text_column):
         """
-        Process a CSV file and either build a new index or load an existing one.
+        Process a CSV file and either build a new index or load an existing one from cache.
 
         Parameters:
         - csv_file_path (str): Path to the CSV file.
@@ -204,12 +203,13 @@ class FaissIndexer:
         index_file_path = f"{os.path.splitext(csv_file_path)[0]}_faiss_index.index"
         synced_data_file_path = f"{os.path.splitext(csv_file_path)[0]}_synced_data.csv"
 
+        # Check if both index and synced data files exist as a form of caching
         if os.path.exists(index_file_path) and os.path.exists(synced_data_file_path):
-            print(f"Index file {index_file_path} and data file {synced_data_file_path} exist. Loading index and data...")
+            print(f"Cache found. Loading index from {index_file_path} and data from {synced_data_file_path}.")
             self.load_index(index_file_path)
             self.original_data = self.load_data_from_csv(synced_data_file_path)
         else:
-            print(f"Index or synced data file not found. Building new index...")
+            print(f"Cache not found. Building new index and data cache...")
             df = self.load_data_from_csv(csv_file_path)
             if df is not None:
                 data = self.transform_vector_column(df, text_column)
@@ -218,4 +218,25 @@ class FaissIndexer:
                     self.save_index(index_file_path)
                     # Save the DataFrame to ensure it is in sync with the index
                     df.to_csv(synced_data_file_path, index=False)
-                    print(f"Synced data saved to {synced_data_file_path}.")
+                    print(f"Index saved to {index_file_path} and synced data saved to {synced_data_file_path}.")
+
+if __name__ == "__main__":
+    indexer = FaissIndexer()
+    csv_file_path = 'data/data_sample.csv'
+    text_column_name = 'idphrase'  # Assuming 'idphrase' is the column containing text data
+    indexer.process_csv_and_build_or_load_index(csv_file_path, text_column_name)
+
+    while True:
+        search_text = input("Enter search text (type 'exit' to quit): ")
+        if search_text.lower() == "exit":
+            break
+
+        neighbor_sensitivity = 75  # User-defined sensitivity from 0 to 100
+        neighbors = indexer.search_by_text(search_text, k=5, neighbor_sensitivity=neighbor_sensitivity)
+
+        if neighbors:
+            print(f"\nSearch results for text query: {search_text}")
+            for dist, original_data in neighbors:
+                print(f"Distance: {dist}, Original Data: {original_data}")
+        else:
+            print("No neighbors found or an error occurred during the search.")
